@@ -3,12 +3,18 @@ import User from "@/models/User";
 import { broadcastToUser, broadcastToAll } from "@/app/api/notifications/stream/notifier";
 import webpush from "web-push";
 
-// Configure web-push
-webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:admin@halaftth.site',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
+// Configure web-push safely
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    try {
+        webpush.setVapidDetails(
+            process.env.VAPID_EMAIL || 'mailto:admin@halaftth.site',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+    } catch (e) {
+        console.warn("Failed to set VAPID details for web-push:", e);
+    }
+}
 
 interface NotifyOptions {
     userId?: string;

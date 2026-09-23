@@ -9,12 +9,18 @@ import webpush from "web-push";
 
 export const dynamic = "force-dynamic";
 
-// Configure web-push once
-webpush.setVapidDetails(
-    process.env.VAPID_EMAIL || 'mailto:admin@halaftth.site',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
+// Configure web-push safely
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    try {
+        webpush.setVapidDetails(
+            process.env.VAPID_EMAIL || 'mailto:admin@halaftth.site',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+    } catch (e) {
+        console.warn("Failed to set VAPID details for web-push:", e);
+    }
+}
 
 interface CustomSessionUser {
     id: string;
